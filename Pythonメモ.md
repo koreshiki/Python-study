@@ -74,7 +74,7 @@ mylist # (1,-1,4)
 ```python
 squares = []
 for x in range(10):
-    squares.append(x)
+    squares.append(x**2)
     
 squares2 = [x**2 for x in range(10)]
 ```
