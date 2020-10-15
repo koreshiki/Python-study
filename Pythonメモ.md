@@ -69,6 +69,12 @@ mylist # (1,-1,4)
 
 ### 内包表記
 
+### 基本型
+
+```python
+hogelist = [expression for var_name in iterable_obj if condition]
+```
+
 次のsquares, suqres2の2つのリストの内容は同じになる
 
 ```python
@@ -79,7 +85,21 @@ for x in range(10):
 squares2 = [x**2 for x in range(10)]
 ```
 
+条件も追加することができる。次のリストeven1, even2はどちらも同じ内容となる
 
+```python
+#(0, 2, 4, 6, 8, 10)
+even1 = [x for x in range(0, 11, 2)]
+even2 = [x for x in range(0, 11, 1) x%2 == 0]
+```
+
+リストに限らず集合(Set)にも適用可能
+
+タプルに関してもtuple関数の引数に内包表記を指定することで適用可能
+
+```python
+hoge_tuple = tuple(x for x in range(0, 11, 2))
+```
 
 ### その他関数
 
@@ -194,6 +214,50 @@ list(mydict.items()) # {'one':1, 'two':2, 'four':4}
 'three' in mydict # False
 ```
 
+### defaultdicによる要素の帰属チェック
+
+例えばある文字列に対して各文字がどの程度出現するか調べたいとする
+
+単純に考えると次のような処理となる
+
+```python
+sample = 'abracadabra'
+str_counter = dict()
+for c in sample:
+    if c not in str_counter:
+        str_counter[c] = 0 #こうすることでelse節を省略できる
+    str_counter[c] += 1
+print(str_counter)
+```
+
+辞書型に対して存在しない要素を指定しようとするとKeyerrorとなるため、まず調べている要素がその辞書に含まれているかをチェックしないといけない
+
+defaultdictを使うと次のようにコードが簡潔に書ける
+
+```python
+from collections import defaultdict
+sample = 'abracadabra'
+str_counter = defaultdict(int) # int()は0を返す
+for c in sample:
+    str_counter[c] += 1
+print(str_counter)
+```
+
+defaultdictに指定したキーが存在しないと自動で生成される。自動生成される値はdefaultdictの引数によって異なる(引数に指定するものはCallableかNoneである必要がある)
+
+なお、上記の場合はCounterを使ったほうが簡潔である
+
+さらにCounter.mostcommon()はリストを返す
+
+```python
+from collections import Counter
+sample = 'abracadabra'
+str_counter = Counter(list(sample))
+print(str_counter) # Counter({'a': 5, 'b': 2, 'r': 2, 'c': 1, 'd': 1})
+print(str_counter.mostcommon()) # [('a', 5), ('b', 2), ('r', 2), ('c', 1), ('d', 1)]
+print(str_counter.mostcommon(1)) # [('a', 5)]
+```
+
 
 
 ## 関数 Function
@@ -256,7 +320,8 @@ twice(10) # 20
 def hello(person='alice'):
 	print('hello', person)
 
-hello('bob')
+hello('bob') # hello bob
+hello()      # hello alice
 ```
 
 #### キーワードを指定する
@@ -282,9 +347,7 @@ numlist = list(range(10)) # 0~9までの整数を含むリストを作成する
 func_list(*numlist) # 0,1,2,3,4,5,6,7,8,9
 ```
 
-
-
-デフォルト引数に変素を指定する場合は、その関数の定義時の値が使われる
+デフォルト引数に変数を指定する場合は、その関数の定義時の値が使われる
 
 ```python
 i = 1
@@ -311,3 +374,48 @@ lambda x : x**x
 ```
 
 用途としてはsortなど行うとき、関数を定義するレベルではないが特殊な動きをさせた問いときなど？
+
+## クラス Class
+
+### 基本型
+
+```python
+class Class_name():
+    def __init__(self, var1, ...):
+        self.var1 = var1
+        ...
+
+```
+
+\_\_init\_\_の中身はそのクラスからインスタンスを生成するときに実行される。（俺はJavaでいうコンストラクタのようなものと理解している）
+
+例えば次のDolphinクラスはインスタンスを生成するときに自身(self)の名前と色を初期化する
+
+```python
+class Dolphin():
+    def __init__(self, name, color):
+        self.name = name
+        self.color = color
+
+sakila = Dolphin('sakila', 'sky-blue')
+sakila.name  # 'sakila'
+sakila.color # 'sky-blue'
+```
+
+### 継承
+
+新しいクラスを生成するとき既存のクラスの機能を利用した時がある。この時、継承を使うとメンテナンスの負担が少なくなる。元となるクラスを親クラス、親クラスから継承されたクラスを子クラスなどと呼んだりする。一般的に子クラスは親クラスであるということがいえる。例えばCarクラスの子クラスBusクラスがあるとBus is Carの関係が成り立つ。また、親になるほど汎化していく
+
+次の例はDolphinクラスを親クラスとするBelugaクラスを示している
+
+```python
+class Beluga(Dolphin):
+    def __init__(self, name):
+        super().__init__(name, color = 'white')
+
+beluga = Beluga('sakila')
+sakila.name  # sakila
+sakila.color # white
+```
+
+この例では親クラスであるDolphinクラスのsuper()を使って\_\_init\_\_を再利用している
